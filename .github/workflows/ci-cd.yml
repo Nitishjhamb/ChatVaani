@@ -16,35 +16,42 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18" # Use a version compatible with your app
+          node-version: "18"
 
       - name: Install Dependencies
         run: npm install
 
       - name: Build Project
         env:
-          VITE_API_KEY: ${{ secrets.API_KEY }} # Inject the API key
+          VITE_API_KEY: ${{ secrets.API_KEY }}
         run: npm run build
+
+      - name: Verify Build Output
+        run: ls -la dist # Check if dist folder exists (Linux command for GitHub's Ubuntu runner)
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: build
+          name: build-output # Consistent artifact name
           path: dist
+          if-no-files-found: error # Fail if dist is empty or missing
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build # Runs only after build succeeds
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Deploy only on push to main
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Download Build Artifact
         uses: actions/download-artifact@v3
         with:
-          name: build
+          name: build-output # Match the name from upload
           path: dist
+
+      - name: Verify Downloaded Artifact
+        run: ls -la dist # Confirm the artifact was downloaded
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }} # Automatically provided by GitHub
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
