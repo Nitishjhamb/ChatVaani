@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.6.0 # Pin to a specific version
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v3.8.1 # Pin to a specific version
         with:
           node-version: "18"
 
@@ -26,15 +26,18 @@ jobs:
           VITE_API_KEY: ${{ secrets.API_KEY }}
         run: npm run build
 
-      - name: Verify Build Output
-        run: ls -la dist # Check if dist folder exists (Linux command for GitHub's Ubuntu runner)
+      - name: Debug Build Output
+        run: |
+          echo "Listing dist contents:"
+          ls -la dist || echo "dist folder not found"
+          if [ -d "dist" ]; then echo "dist exists"; else echo "dist missing"; exit 1; fi
 
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.3 # Pin to a specific version
         with:
-          name: build-output # Consistent artifact name
+          name: build-output
           path: dist
-          if-no-files-found: error # Fail if dist is empty or missing
+          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest
@@ -42,16 +45,18 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.0.2 # Pin to a specific version
         with:
-          name: build-output # Match the name from upload
+          name: build-output
           path: dist
 
-      - name: Verify Downloaded Artifact
-        run: ls -la dist # Confirm the artifact was downloaded
+      - name: Debug Downloaded Artifact
+        run: |
+          echo "Listing downloaded dist contents:"
+          ls -la dist
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v3.9.3 # Pin to a specific version
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
