@@ -67,7 +67,7 @@ const Chatbot = () => {
       .replace(/<li>/, "<ul><li>");
 
     const finalText = formattedText.includes("<li>")
-      ? formattedText.replace(/(<li>.*?<\/li>)+/, "<ul>$&</ul>")
+      ? formattedText.replace(/(<li><\/li>)+/, "<ul>$&</ul>")
       : formattedText;
 
     newMessage.innerHTML = finalText;
