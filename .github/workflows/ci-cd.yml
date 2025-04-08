@@ -23,16 +23,23 @@ jobs:
 
       - name: Build Project
         env:
-          VITE_API_KEY: ${{ secrets.API_KEY }} # No fallback, requires API_KEY to be set
-        run: npm run build
+          VITE_API_KEY: ${{ secrets.API_KEY }}
+          VITE_BASE_PATH: "/ChatVaani/" # Add base path environment variable
+        run: |
+          npm run build
+          # Create 404.html for client-side routing fallback
+          cp dist/index.html dist/404.html
 
       - name: Debug Build Output
         run: |
           echo "Listing dist contents:"
           ls -la dist || echo "dist folder not found"
+          echo "Checking index.html:"
+          grep 'src="/ChatVaani/' dist/index.html || echo 'Path check failed'
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          keep_files: true # Preserve 404.html
