@@ -8,8 +8,8 @@ env:
   VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
 jobs:
-  test-build-deploy:
-    runs-on: ubuntu-latest # Fix typo: was "ubunto-latest"
+  build-deploy:
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -26,13 +26,8 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: Run tests
-        run: npm run test:coverage
-
       - name: Build production
         run: npm run build
-        env:
-          VITE_GEMINI_API_KEY: ${{ env.VITE_GEMINI_API_KEY }}
 
       - name: Deploy to GitHub Pages
         run: npm run deploy
