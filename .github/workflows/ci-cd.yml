@@ -1,45 +1,36 @@
-name: CI/CD for ChatVaani
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
-  build-and-deploy:
+  test-build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: 18.x
+          cache: "npm"
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: Build Project
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test:coverage
+
+      - name: Build production
+        run: npm run build
         env:
-          VITE_API_KEY: ${{ secrets.API_KEY }}
-          VITE_BASE_PATH: "/ChatVaani/" # Add base path environment variable
-        run: |
-          npm run build
-          # Create 404.html for client-side routing fallback
-          cp dist/index.html dist/404.html
-
-      - name: Debug Build Output
-        run: |
-          echo "Listing dist contents:"
-          ls -la dist || echo "dist folder not found"
-          echo "Checking index.html:"
-          grep 'src="/ChatVaani/' dist/index.html || echo 'Path check failed'
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          keep_files: true # Preserve 404.html
+        run: npm run deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
