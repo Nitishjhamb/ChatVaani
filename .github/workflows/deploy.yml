@@ -1,14 +1,12 @@
-name: Deploy with EC2 Runner
+name: Deploy to EC2
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build-deploy:
-    runs-on: self-hosted # Uses your EC2 runner
-    # environment: production
-
+  deploy:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -16,18 +14,25 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: "npm"
 
       - name: Install dependencies
-        run: |
-          npm ci
-          npm install vite @vitejs/plugin-react --save-dev
+        run: npm ci
 
-      - name: Build
+      - name: Build production
         run: npm run build
         env:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
-      - name: Deploy to Nginx
+      - name: Verify build output
+        run: |
+          ls -la dist/
+          ls -la dist/assets/
+
+      - name: Deploy to EC2
         run: |
           sudo rm -rf /var/www/html/*
           sudo cp -r dist/* /var/www/html/
+          sudo chown -R www-data:www-data /var/www/html
+          echo "Deployed files:"
+          ls -la /var/www/html
