@@ -1,13 +1,10 @@
-import { defineConfig } from "vite"; // Add this import
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  // Use the imported function
   plugins: [react()],
-  base: "/ChatVaani/",
   build: {
-    outDir: "../dist",
-    assetsDir: "assets",
+    outDir: "./dist",
     emptyOutDir: true,
     rollupOptions: {
       output: {
