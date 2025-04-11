@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import "./Chatbot.css";
-import ChatVaaniLogo from "../assets/ChatVaaniLogo.svg"; // Make sure path is correct
+import ChatVaaniLogo from "../../public/assets/ChatVaaniLogo.svg"; // Make sure path is correct
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
