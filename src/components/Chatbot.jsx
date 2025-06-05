@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Mic, Send, Menu, Plus, Download } from "lucide-react";
+import { Mic, Send, Menu, Plus, Download, Trash2, X } from "lucide-react";
 import "./Chatbot.scss";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
@@ -103,12 +103,52 @@ const ChatVaani = () => {
     document.body.removeChild(link);
   };
 
+  const clearHistory = () => {
+    const confirmClear = window.confirm(
+      "Are you sure you want to clear all chat history?"
+    );
+    if (confirmClear) {
+      localStorage.removeItem("chatvaani_sessions");
+      setChatSessions([]);
+    }
+  };
+
+  const clearCurrentChat = () => {
+    const confirmClear = window.confirm("Clear current chat?");
+    if (confirmClear) {
+      setCurrentChat([]);
+    }
+  };
+
   return (
     <div className="chatvaani-ui">
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="menu" onClick={() => setSidebarOpen(!sidebarOpen)}>
           <Menu size={24} />
         </div>
+        {/* Add a close button for mobile (optional, but recommended) */}
+        {sidebarOpen && (
+          <button
+            className="close-btn"
+            onClick={() => setSidebarOpen(false)}
+            style={{
+              display: "none", // Hide by default, shown with CSS on mobile
+              position: "absolute",
+              top: "16px",
+              right: "16px",
+              fontSize: "2rem",
+              color: "#fff",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              zIndex: 211,
+              padding: "4px 8px",
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        )}
         {sidebarOpen ? (
           <div className="history">
             <div className="new-chat" onClick={startNewChat}>
@@ -116,6 +156,12 @@ const ChatVaani = () => {
             </div>
             <div className="new-chat" onClick={downloadCurrentChat}>
               <Download size={16} /> Export Chat
+            </div>
+            <div className="new-chat" onClick={clearCurrentChat}>
+              <X size={16} /> Clear Current Chat
+            </div>
+            <div className="new-chat" onClick={clearHistory}>
+              <Trash2 size={16} /> Clear History
             </div>
             {chatSessions.map((session, idx) => (
               <div
@@ -136,6 +182,14 @@ const ChatVaani = () => {
           </div>
         )}
       </aside>
+
+      {/* Mobile backdrop: shown when sidebar is open */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       <main className="chat-area">
         <header className="chat-header">

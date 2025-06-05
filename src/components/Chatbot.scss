@@ -274,16 +274,107 @@
     opacity: 0;
   }
 }
+
+// Sidebar overlay backdrop for mobile
+.sidebar-backdrop {
+  display: none;
+}
+
 @media (max-width: 480px) {
-  .sidebar.open {
-    width: 180px;
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    z-index: 200;
+    background: rgba(
+      30,
+      41,
+      59,
+      0.98
+    ); // Slightly more opaque for overlay effect
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-right: none;
+    padding: 0; // Remove padding so close button aligns
+
+    &.open {
+      width: 80vw; // 80% of viewport width
+      min-width: 180px;
+      max-width: 320px;
+      padding: 10px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    &.closed {
+      width: 0;
+      padding: 0;
+    }
+
+    // Always show menu (hamburger) button on mobile
+    .menu {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 210;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+
+    // Add a close button inside sidebar
+    .close-btn {
+      display: block;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 2rem;
+      color: #fff;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 211;
+      padding: 4px 8px;
+      line-height: 1;
+    }
   }
 
-  .chat-header .title {
-    font-size: 16px;
+  // Sidebar overlay backdrop
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    z-index: 199;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    transition: opacity 0.2s;
+    opacity: 0;
+    pointer-events: none;
+
+    &.open {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
 
-  .bubble {
-    font-size: 13px;
+  // Hide main content scroll when sidebar open
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  // Chat area full width
+  .chat-area {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
   }
 }
